@@ -32,6 +32,7 @@ import cascading.tuple.TupleEntry;
 public class PayloadDatum extends BaseDatum {
 
     public static final String PAYLOAD_FN = fieldName(PayloadDatum.class, "payload");
+    public static final Fields PAYLOAD_FIELD = new Fields(PAYLOAD_FN);
     public static final Fields FIELDS = new Fields(PAYLOAD_FN).append(BaseDatum.getSuperFields(PayloadDatum.class));
 
     private transient Payload _payload;
@@ -61,7 +62,7 @@ public class PayloadDatum extends BaseDatum {
         super.commit();
 
         if (_updated) {
-            _tupleEntry.set(PAYLOAD_FN, _payload.toTuple());
+            _tupleEntry.setTuple(PAYLOAD_FIELD, _payload.toTuple());
             _updated = false;
         }
     }
@@ -73,7 +74,7 @@ public class PayloadDatum extends BaseDatum {
     
     public Payload getPayload() {
         if (_payload == null) {
-            _payload = new Payload((Tuple)_tupleEntry.get(PAYLOAD_FN));
+            _payload = new Payload((Tuple)_tupleEntry.getObject(PAYLOAD_FIELD));
             _updated = false;
         }
         

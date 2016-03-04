@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
+import cascading.stats.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.mapred.JobConf;
 import org.slf4j.Logger;
@@ -23,8 +24,6 @@ import cascading.flow.FlowProcess;
 import cascading.flow.FlowStep;
 import cascading.flow.hadoop.HadoopFlowProcess;
 import cascading.stats.CascadingStats.Status;
-import cascading.stats.FlowStats;
-import cascading.stats.FlowStepStats;
 import cascading.stats.hadoop.HadoopSliceStats;
 import cascading.stats.hadoop.HadoopSliceStats.Kind;
 import cascading.stats.hadoop.HadoopStepStats;
@@ -331,20 +330,25 @@ public class FlowRunner {
            if (stepStats instanceof HadoopStepStats) {
                HadoopStepStats hadoopSS = (HadoopStepStats)stepStats;
                // We don't want/need info on task attempts
-               hadoopSS.captureDetail(false);
+               hadoopSS.captureDetail(CascadingStats.Type.SLICE);
                
                // We have one child for every task. We have to see if it's
                // running, and if so, whether it's a mapper or reducer
-               Iterator<HadoopSliceStats> iter = hadoopSS.getChildren().iterator();
-               while (iter.hasNext()) {
-                   HadoopSliceStats sliceStats = iter.next();
-                   // System.out.println(String.format("id=%s, kind=%s, status=%s", sliceStats.getID(), sliceStats.getKind(), sliceStats.getStatus()));
-                   
-                   if (sliceStats.getStatus() == Status.SUCCESSFUL) {
-                       // Set the total time
-                       // TODO this doesn't seem to be working, I get 0.
-                       // Plus it needs JobInProgress.Counter as a class, which means anyone using
-                       // cascading.utils winds up needing to include Hadoop.
+               Iterator<FlowNodeStats> fniter = hadoopSS.getChildren().iterator();
+
+               while (fniter.hasNext()) {
+                   FlowNodeStats nodeStats = fniter.next();
+                   Iterator<FlowSliceStats> iter = nodeStats.getChildren().iterator();
+                   while (iter.hasNext()) {
+                       FlowSliceStats sliceStats = iter.next();
+
+                       // System.out.println(String.format("id=%s, kind=%s, status=%s", sliceStats.getID(), sliceStats.getKind(), sliceStats.getStatus()));
+
+                       if (sliceStats.getStatus() == Status.SUCCESSFUL) {
+                           // Set the total time
+                           // TODO this doesn't seem to be working, I get 0.
+                           // Plus it needs JobInProgress.Counter as a class, which means anyone using
+                           // cascading.utils winds up needing to include Hadoop.
                        /*
                        incrementCounts(taskCounts, countsKey, flowName, stepName, 
                                        0,
@@ -352,11 +356,14 @@ public class FlowRunner {
                                        sliceStats.getCounterValue(JobInProgress.Counter.SLOTS_MILLIS_MAPS), 
                                        sliceStats.getCounterValue(JobInProgress.Counter.SLOTS_MILLIS_REDUCES));
                        */
-                   } else if (sliceStats.getStatus() == Status.RUNNING) {
-                       if (sliceStats.getKind() == Kind.MAPPER) {
-                           incrementCounts(taskCounts, countsKey, flowName, stepName, 1, 0, 0, 0);
-                       } else if (sliceStats.getKind() == Kind.REDUCER) {
-                           incrementCounts(taskCounts, countsKey, flowName, stepName, 0, 1, 0, 0);
+                       } else if (sliceStats.getStatus() == Status.RUNNING) {
+                           HadoopSliceStats hss = (HadoopSliceStats) sliceStats;
+
+                           if (sliceStats.getKind() == Kind.MAPPER) {
+                               incrementCounts(taskCounts, countsKey, flowName, stepName, 1, 0, 0, 0);
+                           } else if (sliceStats.getKind() == Kind.REDUCER) {
+                               incrementCounts(taskCounts, countsKey, flowName, stepName, 0, 1, 0, 0);
+                           }
                        }
                    }
                }
@@ -388,7 +395,7 @@ public class FlowRunner {
            
            if (stepStats instanceof HadoopStepStats) {
                HadoopStepStats hadoopSS = (HadoopStepStats)stepStats;
-               hadoopSS.getTaskStats().clear();
+               hadoopSS.getFlowNodeStats().clear();
            }
         }
     }

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import cascading.flow.FlowConnector;
 import cascading.flow.FlowProcess;
-import cascading.flow.hadoop.HadoopFlowConnector;
+import cascading.flow.hadoop2.Hadoop2MR1FlowConnector;
 import cascading.flow.hadoop.HadoopFlowProcess;
 import cascading.flow.hadoop.util.HadoopUtil;
 import cascading.scheme.Scheme;
@@ -36,7 +36,6 @@ import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tap.hadoop.Hfs;
 import cascading.tap.hadoop.PartitionTap;
-import cascading.tap.hadoop.TemplateTap;
 import cascading.tap.partition.Partition;
 import cascading.tuple.Fields;
 
@@ -255,7 +254,7 @@ public class HadoopPlatform extends BasePlatform {
             }
         }
         
-        return new HadoopFlowConnector(mergedProps);
+        return new Hadoop2MR1FlowConnector(mergedProps);
     }
 
     @Override
@@ -276,11 +275,6 @@ public class HadoopPlatform extends BasePlatform {
     @Override
     public Tap makeTap(Scheme scheme, BasePath path, SinkMode mode) {
         return new Hfs(scheme, path.getAbsolutePath(), mode);
-    }
-
-    @Override
-    public Tap makeTemplateTap(Tap tap, String pattern, Fields fields) throws Exception {
-        return new TemplateTap((Hfs) tap, pattern, fields);
     }
     
     @Override

@@ -254,7 +254,7 @@ public class TopTermsByLLR extends SubAssembly {
         }
     }
 
-    public TopTermsByLLR(Pipe docsPipe, ITermsParser parser, final int maxTerms) {
+    public TopTermsByLLR(Pipe docsPipe, ITermsParser parser, final int maxTerms, final int threshold) {
         this(docsPipe, parser, new ITermsFilter() {
             
             @Override
@@ -266,7 +266,11 @@ public class TopTermsByLLR extends SubAssembly {
             public boolean filter(double llrScore, String term, ITermsParser parser) {
                 return false;
             }
-        }, new Fields("docId"), new Fields("text"), AggregateBy.CompositeFunction.DEFAULT_THRESHOLD);
+        }, new Fields("docId"), new Fields("text"), threshold);
+    }
+
+    public TopTermsByLLR(Pipe docsPipe, ITermsParser parser, final int maxTerms) {
+        this(docsPipe, parser, maxTerms, 10000);
     }
 
     /**

@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.scaleunlimited.cascading.GroupLimit;
 
 import cascading.flow.Flow;
-import cascading.flow.hadoop.HadoopFlowConnector;
+import cascading.flow.hadoop2.Hadoop2MR1FlowConnector;
 import cascading.flow.hadoop.HadoopFlowProcess;
 import cascading.pipe.Every;
 import cascading.pipe.GroupBy;
@@ -48,7 +48,7 @@ public class GroupLimitTest {
         
         Lfs sinkTap = new Lfs(new SequenceFile(testFields), out, SinkMode.REPLACE);
         
-        Flow flow = new HadoopFlowConnector().connect(sourceTap, sinkTap, pipe);
+        Flow flow = new Hadoop2MR1FlowConnector().connect(sourceTap, sinkTap, pipe);
         flow.complete();
         
         TupleEntryIterator iter = sinkTap.openForRead(new HadoopFlowProcess());

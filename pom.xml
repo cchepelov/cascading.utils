@@ -23,7 +23,7 @@
 	<artifactId>cascading.utils</artifactId>
 	<name>Scale Unlimited utilities for Cascading</name>
 	<packaging>jar</packaging>
-	<version>2.7-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<repositories>
 		<repository>
 			<id>Conjar</id>
@@ -47,8 +47,8 @@
     </repositories>
 	
     <properties>
-        <cascading.version>2.5.5</cascading.version>
-        <hadoop.version>2.2.0</hadoop.version>
+        <cascading.version>3.0.4</cascading.version>
+        <hadoop.version>2.6.0</hadoop.version>
     </properties>
     
 	<dependencies>
@@ -128,8 +128,38 @@
             <groupId>cascading</groupId>
             <artifactId>cascading-hadoop2-mr1</artifactId>
             <version>${cascading.version}</version>
+            <scope>provided</scope>
         </dependency>
-         
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${hadoop.version}</version>
+            <classifier>tests</classifier>
+            <!-- <scope>test</scope> -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-jobclient</artifactId>
+            <version>${hadoop.version}</version>
+            <classifier>tests</classifier>
+            <!-- <scope>test</scope> -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-aws</artifactId>
+            <version>${hadoop.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>7.0.10</version>
+        </dependency>
+
         <!-- For KryoScheme -->
         <dependency>
             <groupId>com.esotericsoftware.kryo</groupId>
@@ -287,6 +317,5 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
-        
-	</dependencies>
+    </dependencies>
 </project>

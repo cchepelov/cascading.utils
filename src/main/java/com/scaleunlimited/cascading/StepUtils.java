@@ -16,6 +16,7 @@
 
 package com.scaleunlimited.cascading;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -48,7 +49,7 @@ public class StepUtils {
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static void nameFlowStep(BaseFlowStep step) {
-        List<Group> groups = step.getGroups();
+        ArrayList<Group> groups = new ArrayList<Group>(step.getGroups());
         
         String stepName = "";
         if (groups.size() == 0) {
