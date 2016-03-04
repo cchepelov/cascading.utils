@@ -19,3 +19,5 @@ private
 junit*.properties
 (related)
 *flow-monitor.html
+.idea
+*~
